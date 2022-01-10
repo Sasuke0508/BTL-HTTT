@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BTL-HTTT.iml" filepath="$PROJECT_DIR$/BTL-HTTT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChanDoanChanThuong/ChanDoanChanThuong.iml" filepath="$PROJECT_DIR$/ChanDoanChanThuong/ChanDoanChanThuong.iml" />
+    </modules>
+  </component>
+</project>

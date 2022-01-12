@@ -3,11 +3,11 @@ package com.example.chandoanchanthuong.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +17,10 @@ import javax.persistence.Table;
 public class GroupSympton {
     @Id
     @Column(name = "ID")
-    public int id;
+    private int id;
     @Column(name = "Name")
-    public String name;
+    private String name;
+    @OneToMany(targetEntity = Sympton.class, mappedBy = "groupSympton", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Sympton> symptonList;
 }

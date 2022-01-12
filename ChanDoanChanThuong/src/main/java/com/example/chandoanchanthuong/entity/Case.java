@@ -18,6 +18,8 @@ public class Case {
     private int id;
     @Column(name = "CreateDate")
     private Date createDate;
+    @Column(name = "Type")
+    private String type;
     @ManyToMany
     @JoinTable(name = "case_diseasedefingsympton",
             joinColumns = @JoinColumn(name = "CaseID"),
@@ -38,4 +40,9 @@ public class Case {
             joinColumns = @JoinColumn(name = "CaseID"),
             inverseJoinColumns = @JoinColumn(name = "DiseaseID"))
     private List<Disease> diseaseList;
+    @ManyToMany
+    @JoinTable(name = "case_medicalhistory",
+            joinColumns = @JoinColumn(name = "CaseID"),
+            inverseJoinColumns = @JoinColumn(name = "MedicalHistoryID"))
+    private List<MedicalHistory> medicalHistoryList;
 }

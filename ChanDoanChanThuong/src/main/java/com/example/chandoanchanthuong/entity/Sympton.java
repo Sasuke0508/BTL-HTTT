@@ -18,7 +18,9 @@ public class Sympton {
     public int id;
     @Column(name = "Name")
     public String name;
-    @ManyToOne(targetEntity = GroupSympton.class, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GroupSymptonID")
     private GroupSympton groupSympton;
+    @Column(name = "Type")
+    private String type;
 }

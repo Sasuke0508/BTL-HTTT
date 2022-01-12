@@ -19,4 +19,6 @@ public class Disease {
     private String name;
     @Column(name = "Description")
     private String description;
+    @Column(name = "Type")
+    private String type;
 }

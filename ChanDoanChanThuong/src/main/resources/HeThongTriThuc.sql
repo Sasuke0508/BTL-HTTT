@@ -1,31 +1,37 @@
+CREATE DATABASE httt_chandoanchanthuong;
+USE httt_chandoanchanthuong;
+
 CREATE TABLE Sympton (
   ID             int(10) NOT NULL AUTO_INCREMENT, 
   GroupSymptonID int(10) NOT NULL, 
-  Name           varchar(1000) NOT NULL, 
+  Name           varchar(1000), 
+  Type           varchar(255), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE Disease (
   ID          int(10) NOT NULL AUTO_INCREMENT, 
-  Name        varchar(255) NOT NULL, 
-  Description varchar(1000) NOT NULL, 
+  Name        varchar(255), 
+  Description varchar(10000), 
+  Type        varchar(255), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE DiseaseLevel (
   ID        int(10) NOT NULL AUTO_INCREMENT, 
   DiseaseID int(10) NOT NULL, 
-  Name      varchar(255) NOT NULL, 
+  Name      varchar(255), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE Reason (
   ID     int(10) NOT NULL AUTO_INCREMENT, 
-  Name   varchar(1000) NOT NULL, 
+  Name   varchar(1000), 
   Weight double NOT NULL, 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE Solution (
   ID        int(10) NOT NULL AUTO_INCREMENT, 
-  Content   varchar(1000) NOT NULL, 
+  Content   varchar(10000), 
   Reference varchar(1000), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE `Case` (
   ID         int(10) NOT NULL AUTO_INCREMENT, 
-  CreateDate date NOT NULL, 
+  CreateDate date, 
+  Type       varchar(255), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE DiseaseDefingSympton (
   ID     int(10) NOT NULL, 
@@ -34,13 +40,13 @@ CREATE TABLE DiseaseDefingSympton (
 CREATE TABLE DiseaseLevelDefingSympton (
   ID             int(10) NOT NULL, 
   DiseaseLevelID int(10) NOT NULL, 
-  IsQuantitative bit(1) NOT NULL, 
-  FromAmount     int(10), 
-  ToAmount       int(10), 
+  IsQuantitative bit(1), 
+  FromAmount     int(10) NOT NULL, 
+  ToAmount       int(10) NOT NULL, 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE GroupSympton (
   ID   int(10) NOT NULL AUTO_INCREMENT, 
-  Name varchar(1000) NOT NULL, 
+  Name varchar(1000), 
   PRIMARY KEY (ID)) ENGINE=InnoDB;
 CREATE TABLE Case_Disease (
   CaseID    int(10) NOT NULL, 
@@ -77,6 +83,21 @@ CREATE TABLE DiseaseDefingSympton_Disease (
   DiseaseID             int(10) NOT NULL, 
   PRIMARY KEY (DiseaseDefingSymptonD, 
   DiseaseID)) ENGINE=InnoDB;
+CREATE TABLE MedicalHistory (
+  ID     int(10) NOT NULL AUTO_INCREMENT, 
+  Name   varchar(1000), 
+  Weight double NOT NULL, 
+  PRIMARY KEY (ID)) ENGINE=InnoDB;
+CREATE TABLE MedicalHistory_Disease (
+  MedicalHistoryID int(10) NOT NULL, 
+  DiseaseID        int(10) NOT NULL, 
+  PRIMARY KEY (MedicalHistoryID, 
+  DiseaseID)) ENGINE=InnoDB;
+CREATE TABLE Case_MedicalHistory (
+  CaseID           int(10) NOT NULL, 
+  MedicalHistoryID int(10) NOT NULL, 
+  PRIMARY KEY (CaseID, 
+  MedicalHistoryID)) ENGINE=InnoDB;
 ALTER TABLE DiseaseDefingSympton ADD CONSTRAINT FKDiseaseDef404172 FOREIGN KEY (ID) REFERENCES Sympton (ID);
 ALTER TABLE DiseaseLevelDefingSympton ADD CONSTRAINT FKDiseaseLev307706 FOREIGN KEY (ID) REFERENCES Sympton (ID);
 ALTER TABLE Sympton ADD CONSTRAINT FKSympton528449 FOREIGN KEY (GroupSymptonID) REFERENCES GroupSympton (ID);
@@ -96,3 +117,7 @@ ALTER TABLE Reason_Disease ADD CONSTRAINT FKReason_Dis573600 FOREIGN KEY (Reason
 ALTER TABLE Reason_Disease ADD CONSTRAINT FKReason_Dis873446 FOREIGN KEY (DiseaseID) REFERENCES Disease (ID);
 ALTER TABLE DiseaseDefingSympton_Disease ADD CONSTRAINT FKDiseaseDef984070 FOREIGN KEY (DiseaseDefingSymptonD) REFERENCES DiseaseDefingSympton (ID);
 ALTER TABLE DiseaseDefingSympton_Disease ADD CONSTRAINT FKDiseaseDef591227 FOREIGN KEY (DiseaseID) REFERENCES Disease (ID);
+ALTER TABLE MedicalHistory_Disease ADD CONSTRAINT FKMedicalHis773636 FOREIGN KEY (MedicalHistoryID) REFERENCES MedicalHistory (ID);
+ALTER TABLE MedicalHistory_Disease ADD CONSTRAINT FKMedicalHis264698 FOREIGN KEY (DiseaseID) REFERENCES Disease (ID);
+ALTER TABLE Case_MedicalHistory ADD CONSTRAINT FKCase_Medic494762 FOREIGN KEY (CaseID) REFERENCES `Case` (ID);
+ALTER TABLE Case_MedicalHistory ADD CONSTRAINT FKCase_Medic699048 FOREIGN KEY (MedicalHistoryID) REFERENCES MedicalHistory (ID);

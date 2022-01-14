@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,17 +119,18 @@ public class CaseBaseReasoning {
 
         // Get list case có trong hệ thống
         List<Case> listCase = caseRepo.findAll();
-        Map<Case, Double> listCaseInSystem = new TreeMap<>();
+        listCase.forEach(aCase -> System.out.println(aCase.getId()));
+        Map<Case, Double> listCaseInSystem = new TreeMap<Case, Double>();
         if (typeList.size() > 0) {
             // Get list case by list type of disease
             for (Case aCase : listCase) {
                 if (checkTypeDiseaseOfCase(typeList, aCase)) {
-                    listCaseInSystem.put(aCase, Double.valueOf(0));
+                    listCaseInSystem.put(aCase, Double.valueOf(0.0));
                 }
             }
         } else {
             for (Case aCase : listCase) {
-                listCaseInSystem.put(aCase, Double.valueOf(0));
+                listCaseInSystem.put(aCase, Double.valueOf(0.0));
             }
         }
 
@@ -137,8 +139,18 @@ public class CaseBaseReasoning {
         List<String> finalReasonList = reasonList;
         List<String> finalMedicalHistoryList = medicalHistoryList;
         List<String> finalSymptonList = symptonList;
-        listCaseInSystem.forEach((aCase, aDouble) -> listCaseInSystem.put(aCase, -1 * cbr(aCase, finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight)));
-
+        if(listCaseInSystem == null){
+            System.out.println("Case null");
+        }
+//        listCaseInSystem.forEach((aCase, aDouble) -> listCaseInSystem.put(aCase, -1 * cbr(aCase, finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight)));
+        Set<Case> listCaseKey = listCaseInSystem.keySet();
+        for(Case key : listCaseKey){
+            if(key==null){
+                System.out.println("Có key null");
+                break;
+            }
+            listCaseInSystem.put(key, -1 * cbr(key, finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight));
+        }
         // Kiểm tra và kết luận
         Map<Case, Double> mapResult = new HashMap<>();
         Set<Case> listCaseSystem = listCaseInSystem.keySet();
@@ -177,10 +189,22 @@ public class CaseBaseReasoning {
             model.addAttribute("error", "Không thể xác định được bệnh!");
         } else {
             List<Disease> listResult = output.stream().collect(Collectors.toList());
+            Case newCase = new Case();
+            newCase.setCreateDate(new Date(new Date().getTime()));
+            newCase.setDiseaseDefingSymptonList(listDDSResult);
+            newCase.setReasonList(listReasonResult);
+            newCase.setDiseaseList(listResult);
+            newCase.setMedicalHistoryList(listMedicalHistoryResult);
+            System.out.println("Bệnh: " + listResult.get(0).getName() + " " + maxCompare*100 + "%");
+            System.out.println("Tổng trọng số của case: " + sumOfWeight);
+//            caseRepo.save(newCase);
+
             model.addAttribute("listResult", listResult);
+            model.addAttribute("compare", Math.round(maxCompare * 10000) / 100);
 //            Nếu chỉ có 1 bệnh thì kiểm tra xem bệnh đó có phân chia mức độ không?
-            if (listResult.size() == 1) {
+            if (listResult.size() == 1 && listResult.get(0).getDiseaseLevels()!=null && !listResult.get(0).getDiseaseLevels().isEmpty()) {
                 model.addAttribute("diseaseLevelList", listResult.get(0).getDiseaseLevels());
+                System.out.println("Bệnh: " + listResult.get(0).getName());
             }
         }
 
@@ -226,11 +250,11 @@ public class CaseBaseReasoning {
 
         // get All group sympton
         List<GroupSympton> groupSymptonList = groupSymptonRepo.findAll();
-        groupSymptonList = groupSymptonList.stream().filter(groupSympton -> groupSympton.getId() != 2).collect(Collectors.toList());
+        groupSymptonList = groupSymptonList.stream().filter(groupSympton -> !groupSympton.getName().equals("NoName")).collect(Collectors.toList());
 
         // get symptons khong thuoc group nao
         // 2 la group , sau dua ve la 1
-        List<Sympton> symptonList = symptonRepo.findById(1).get().getGroupSympton().getSymptonList();
+        List<Sympton> symptonList = groupSymptonRepo.findById(1).get().getSymptonList();
         // Lọc triệu chứng lâm sàng
         List<Sympton> listClinicalSymptom = symptonList.stream().filter(sympton -> sympton.getType().equals("LS")).collect(Collectors.toList());
         List<GroupSympton> listGroupClinicalSymptom = new ArrayList<>();
@@ -238,12 +262,14 @@ public class CaseBaseReasoning {
         for (GroupSympton groupSympton : groupSymptonList) {
             if (!groupSympton.getName().equals("NoName")) {
                 for (Sympton sympton : groupSympton.getSymptonList()) {
-                    if (sympton.getType().equals("LS")) {
-                        listGroupClinicalSymptom.add(groupSympton);
-                        break;
-                    } else {
-                        listGroupSubclinicalSymptom.add(groupSympton);
-                        break;
+                    if(sympton.getTypeOfSympton().equals("DiseaseDefingSympton")){
+                        if (sympton.getType().equals("LS")) {
+                            listGroupClinicalSymptom.add(groupSympton);
+                            break;
+                        } else {
+                            listGroupSubclinicalSymptom.add(groupSympton);
+                            break;
+                        }
                     }
                 }
             }
@@ -255,7 +281,7 @@ public class CaseBaseReasoning {
 
         // Lọc triệu chứng cận lâm sàng
 
-        List<Sympton> listSubclinicalSymptom = symptonList.stream().filter(sympton -> sympton.getType().equals("CLS")).collect(Collectors.toList());
+        List<Sympton> listSubclinicalSymptom = symptonList.stream().filter(sympton -> sympton.getType().equals("CLS") && sympton.getTypeOfSympton().equals("DiseaseDefingSympton")).collect(Collectors.toList());
         listSubclinicalSymptom = listSubclinicalSymptom.stream().sorted(Comparator.comparingInt(o -> o.getName().length())).collect(Collectors.toList());
         listGroupSubclinicalSymptom.forEach(groupSympton -> groupSympton.setSymptonList(groupSympton.getSymptonList().stream().sorted(Comparator.comparingInt(o -> o.getName().length())).collect(Collectors.toList())));
         model.addAttribute("listSubclinicalSymptom", listSubclinicalSymptom);

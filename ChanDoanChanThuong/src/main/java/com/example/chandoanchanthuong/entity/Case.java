@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 @Data
@@ -12,14 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "cases")
-public class Case {
+public class Case implements Comparable<Case> {
     @Id
     @Column(name = "ID")
     private int id;
     @Column(name = "CreateDate")
     private Date createDate;
-    @Column(name = "Type")
-    private String type;
     @ManyToMany
     @JoinTable(name = "case_diseasedefingsympton",
             joinColumns = @JoinColumn(name = "CaseID"),
@@ -45,4 +44,12 @@ public class Case {
             joinColumns = @JoinColumn(name = "CaseID"),
             inverseJoinColumns = @JoinColumn(name = "MedicalHistoryID"))
     private List<MedicalHistory> medicalHistoryList;
+
+    @Override
+    public int compareTo(Case o) {
+        if(this.getId() == o.getId()){
+            return 0;
+        }
+        return 1;
+    }
 }

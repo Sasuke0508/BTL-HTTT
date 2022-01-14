@@ -23,4 +23,6 @@ public class Sympton {
     private GroupSympton groupSympton;
     @Column(name = "Type")
     private String type;
+    @Column(name="TypeOfSympton")
+    private String typeOfSympton;
 }

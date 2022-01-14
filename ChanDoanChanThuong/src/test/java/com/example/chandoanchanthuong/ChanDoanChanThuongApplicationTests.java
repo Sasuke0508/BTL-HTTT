@@ -1,8 +1,10 @@
 package com.example.chandoanchanthuong;
 
+import com.example.chandoanchanthuong.entity.Case;
 import com.example.chandoanchanthuong.entity.Disease;
 import com.example.chandoanchanthuong.entity.GroupSympton;
 import com.example.chandoanchanthuong.entity.Sympton;
+import com.example.chandoanchanthuong.repository.CaseRepo;
 import com.example.chandoanchanthuong.repository.GroupSymptonRepo;
 import com.example.chandoanchanthuong.repository.ReasonRepo;
 import com.example.chandoanchanthuong.repository.SymptonRepo;
@@ -25,6 +27,9 @@ class ChanDoanChanThuongApplicationTests {
     @Autowired
     private SymptonRepo symptonRepo;
 
+    @Autowired
+    private CaseRepo caseRepo;
+
     @Test
     void contextLoads() {
         // get All group sympton
@@ -41,6 +46,16 @@ class ChanDoanChanThuongApplicationTests {
        symptonList.forEach(sympton -> {
            System.out.println(sympton.name);
        });
+<<<<<<< Updated upstream
+=======
+
+    }
+
+    @Test
+    void loadCase() {
+        List<Case> caseList = caseRepo.findAll();
+        System.out.println(caseList.size());
+>>>>>>> Stashed changes
     }
 
     @Test

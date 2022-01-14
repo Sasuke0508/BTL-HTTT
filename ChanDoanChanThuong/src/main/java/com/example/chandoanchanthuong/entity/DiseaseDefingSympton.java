@@ -16,7 +16,7 @@ public class DiseaseDefingSympton extends Sympton{
     @Column(name = "Weight")
     private double weight;
     @ManyToMany
-    @JoinTable(name = "diseasedefingsymton_disease",
+    @JoinTable(name = "diseasedefingsympton_disease",
             joinColumns = @JoinColumn(name = "DiseaseDefingSymptonID"),
             inverseJoinColumns = @JoinColumn(name = "DiseaseID"))
     private List<Disease> diseaseList;

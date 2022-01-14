@@ -52,4 +52,9 @@ public class Case implements Comparable<Case> {
         }
         return 1;
     }
+
+    @Override
+    public String toString(){
+        return "";
+    }
 }

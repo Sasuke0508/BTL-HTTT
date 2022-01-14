@@ -4,6 +4,7 @@ import com.example.chandoanchanthuong.entity.*;
 import com.example.chandoanchanthuong.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -120,17 +121,17 @@ public class CaseBaseReasoning {
         // Get list case có trong hệ thống
         List<Case> listCase = caseRepo.findAll();
         listCase.forEach(aCase -> System.out.println(aCase.getId()));
-        Map<Case, Double> listCaseInSystem = new TreeMap<Case, Double>();
+        Map<String, Double> listCaseInSystem = new TreeMap<String, Double>();
         if (typeList.size() > 0) {
             // Get list case by list type of disease
             for (Case aCase : listCase) {
                 if (checkTypeDiseaseOfCase(typeList, aCase)) {
-                    listCaseInSystem.put(aCase, Double.valueOf(0.0));
+                    listCaseInSystem.put(aCase.getId()+"", Double.valueOf(0.0));
                 }
             }
         } else {
             for (Case aCase : listCase) {
-                listCaseInSystem.put(aCase, Double.valueOf(0.0));
+                listCaseInSystem.put(aCase.getId()+"", Double.valueOf(0.0));
             }
         }
 
@@ -139,33 +140,19 @@ public class CaseBaseReasoning {
         List<String> finalReasonList = reasonList;
         List<String> finalMedicalHistoryList = medicalHistoryList;
         List<String> finalSymptonList = symptonList;
-        if(listCaseInSystem == null){
-            System.out.println("Case null");
-        }
-//        listCaseInSystem.forEach((aCase, aDouble) -> listCaseInSystem.put(aCase, -1 * cbr(aCase, finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight)));
-        Set<Case> listCaseKey = listCaseInSystem.keySet();
-        for(Case key : listCaseKey){
-            if(key==null){
-                System.out.println("Có key null");
-                break;
-            }
-            listCaseInSystem.put(key, -1 * cbr(key, finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight));
-        }
+        listCaseInSystem.forEach((idCase, aDouble) -> listCaseInSystem.put(idCase, cbr(caseRepo.getById(Integer.valueOf(idCase)), finalReasonList, finalMedicalHistoryList, finalSymptonList, finalSumOfWeight)));
         // Kiểm tra và kết luận
-        Map<Case, Double> mapResult = new HashMap<>();
-        Set<Case> listCaseSystem = listCaseInSystem.keySet();
+        Map<String, Double> mapResult = new HashMap<>();
+        Set<String> listCaseSystem = listCaseInSystem.keySet();
         //
         double maxCompare = 0;
-        for (Case key : listCaseSystem) {
+        for (String key : listCaseSystem) {
             // Nếu độ tương đồng lớn nhất nhỏ hơn 40% thì break
-            if (listCaseInSystem.get(key) * -1 < 0.4) {
-                maxCompare = listCaseInSystem.get(key) * -1;
-                break;
-            } else {
-                maxCompare = listCaseInSystem.get(key) * -1;
-                break;
-            }
+               if( maxCompare < listCaseInSystem.get(key)){
+                   maxCompare = listCaseInSystem.get(key);
+               }
         }
+
         if (maxCompare < 0.4) {
             //Thông báo không xác định được bệnh
             model.addAttribute("error", "Không thể xác định được bệnh!");
@@ -176,15 +163,16 @@ public class CaseBaseReasoning {
             return "result";
         }
         // Lấy ra tất cae case case có cùng độ tương đồng cao nhất
-        for (Case key : listCaseSystem) {
-            if (listCaseInSystem.get(key) * -1 == maxCompare) {
+        for (String key : listCaseSystem) {
+            System.out.println(listCaseInSystem.get(key));
+            if (listCaseInSystem.get(key) == maxCompare) {
                 mapResult.put(key, maxCompare);
-            } else break;
+            }
         }
         // Lấy ra tất cả các bệnh
         Set<Disease> output = new HashSet<>();
-        mapResult.forEach((aCase, aDouble) -> aCase.getDiseaseList().forEach(disease -> output.add(disease)));
-        if (output.size() > 2) {
+        mapResult.forEach((aCase, aDouble) -> caseRepo.getById(Integer.valueOf(aCase)).getDiseaseList().forEach(disease -> output.add(disease)));
+        if (output.size() > 2 || output.size() == 0) {
             //Thông báo không xác định được bệnh
             model.addAttribute("error", "Không thể xác định được bệnh!");
         } else {
@@ -197,12 +185,13 @@ public class CaseBaseReasoning {
             newCase.setMedicalHistoryList(listMedicalHistoryResult);
             System.out.println("Bệnh: " + listResult.get(0).getName() + " " + maxCompare*100 + "%");
             System.out.println("Tổng trọng số của case: " + sumOfWeight);
-//            caseRepo.save(newCase);
+            newCase.setId((int)caseRepo.count()+ 1);
+            caseRepo.save(newCase);
 
             model.addAttribute("listResult", listResult);
-            model.addAttribute("compare", Math.round(maxCompare * 10000) / 100);
+            model.addAttribute("compare", 100*Math.round(maxCompare * 100) / 100);
 //            Nếu chỉ có 1 bệnh thì kiểm tra xem bệnh đó có phân chia mức độ không?
-            if (listResult.size() == 1 && listResult.get(0).getDiseaseLevels()!=null && !listResult.get(0).getDiseaseLevels().isEmpty()) {
+            if (listResult.size() == 1 && listResult.get(0).getDiseaseLevels()!=null) {
                 model.addAttribute("diseaseLevelList", listResult.get(0).getDiseaseLevels());
                 System.out.println("Bệnh: " + listResult.get(0).getName());
             }
@@ -231,9 +220,37 @@ public class CaseBaseReasoning {
         List<DiseaseDefingSympton> diseaseDefingSymptonListInSystem = caseInSystem.getDiseaseDefingSymptonList();
 
         double res = 0;
-        res = res + reasonListInSystem.stream().filter(reason -> reasonList.stream().anyMatch(reasonCompare -> reasonCompare.equals(reason.getId() + ""))).mapToDouble(Reason::getWeight).sum();
-        res = res + medicalHistoryListInSystem.stream().filter(medicalHistory -> medicalHistoryList.stream().anyMatch(medicalHistoryCompare -> medicalHistoryCompare.equals(medicalHistory.getId() + ""))).mapToDouble(MedicalHistory::getWeight).sum();
-        res = res + diseaseDefingSymptonListInSystem.stream().filter(ddSympton -> diseaseDefingSymptonList.stream().anyMatch(ddSymptonCompare -> ddSymptonCompare.equals(ddSympton.getId() + ""))).mapToDouble(DiseaseDefingSympton::getWeight).sum();
+        for(String reason : reasonList){
+            for(Reason reasonCompare: reasonListInSystem){
+                if(reason.equals(reasonCompare.getId()+"")){
+                    res+=reasonCompare.getWeight();
+                    break;
+                }
+            }
+        }
+
+        for(String medicalHistory : medicalHistoryList){
+            for(MedicalHistory medicalHistory1: medicalHistoryListInSystem){
+                if(medicalHistory.equals(medicalHistory1.getId()+"")){
+                    res+=medicalHistory1.getWeight();
+                    break;
+                }
+            }
+        }
+
+        for(String dds : diseaseDefingSymptonList){
+            for(DiseaseDefingSympton dds1 : diseaseDefingSymptonListInSystem){
+                if(dds.equals(dds1.getId()+"")){
+                    res+=dds1.getWeight();
+                    break;
+                }
+            }
+        }
+//        res = res + reasonListInSystem.stream().filter(reason -> reasonList.stream().anyMatch(reasonCompare -> reasonCompare.equals(reason.getId() + ""))).mapToDouble(Reason::getWeight).sum();
+//        res = res + medicalHistoryListInSystem.stream().filter(medicalHistory -> medicalHistoryList.stream().anyMatch(medicalHistoryCompare -> medicalHistoryCompare.equals(medicalHistory.getId() + ""))).mapToDouble(MedicalHistory::getWeight).sum();
+//        res = res + diseaseDefingSymptonListInSystem.stream().filter(ddSympton -> diseaseDefingSymptonList.stream().anyMatch(ddSymptonCompare -> ddSymptonCompare.equals(ddSympton.getId() + ""))).mapToDouble(DiseaseDefingSympton::getWeight).sum();
+        System.out.println("Case " + caseInSystem.getId() + " tương đồng " + res);
+        caseInSystem.getReasonList().forEach(reason -> System.out.println(reason.getName()));
         return res / sumOfWeight;
     }
 

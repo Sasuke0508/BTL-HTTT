@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class ChanDoanChanThuongApplicationTests {
@@ -35,12 +37,22 @@ class ChanDoanChanThuongApplicationTests {
 
        // get symptons khong thuoc group nao
         // 2 la group , sau dua ve la 1
-       List<Sympton> symptonList = symptonRepo.findById(2).get().getGroupSympton().getSymptonList();
+       List<Sympton> symptonList = symptonRepo.findById(1).get().getGroupSympton().getSymptonList();
        symptonList.forEach(sympton -> {
            System.out.println(sympton.name);
        });
-
-       
     }
 
+    @Test
+    public void setValueInMap(){
+        Map<String, String> mapTest = new HashMap<>();
+        for (int i = 0; i < 10; i++) {
+            mapTest.put("Key" + i, ""+i);
+        }
+        System.out.println("==================== Before ====================");
+        mapTest.forEach((s, s2) -> System.out.println(s + ": " + s2));
+        mapTest.forEach((s, s2) -> mapTest.put(s, s2+" change"));
+        System.out.println("==================== After ====================");
+        mapTest.forEach((s, s2) -> System.out.println(s + ": " + s2));
+    }
 }

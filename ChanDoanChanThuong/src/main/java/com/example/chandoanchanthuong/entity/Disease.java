@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,4 +22,6 @@ public class Disease {
     private String description;
     @Column(name = "Type")
     private String type;
+    @OneToMany
+    private List<DiseaseLevel> diseaseLevels;
 }

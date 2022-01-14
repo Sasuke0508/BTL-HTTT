@@ -152,8 +152,8 @@
                                     <input
                                             id="Cẳng chân, cổ chân"
                                             type="checkbox"
-                                            name="vung-dau"
-                                            value="Cẳng chân, cổ chân"
+                                            name="vung-chan-thuong"
+                                            value="Co_chan"
                                     />
                                     <label class="ps-3">Cẳng chân, cổ chân</label>
                                 </div>
@@ -163,37 +163,26 @@
                                     <input
                                             id="Đầu gối"
                                             type="checkbox"
-                                            name="vung-dau"
-                                            value="Đầu gối"
+                                            name="vung-chan-thuong"
+                                            value="Dau_goi"
                                     />
                                     <label class="ps-3">Đầu gối</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <h5 class="fw-bold text-primary">Bệnh sử</h5>
+                    <h5 class="fw-bold text-primary">Bệnh sử (Đã từng chấn thương, bệnh nền, ...)</h5>
                     <div class="mb-3">
                         <div class="row">
-                            <div class="col-md-6 col-lg-6 col-xl-3">
+                            <div th:each="medicalHistory: ${listMedicalHistory}" class="col-md-6 col-lg-6 col-xl-3">
                                 <div class="d-flex align-items-baseline">
                                     <input
-                                            id="1"
+                                            th:id="${medicalHistory.id}"
                                             type="checkbox"
-                                            name="vung-dau"
-                                            value="Cẳng chân, cổ chân"
+                                            name="benh-su"
+                                            th:value="${medicalHistory.id}"
                                     />
-                                    <label class="ps-3">Cẳng chân, cổ chân</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6 col-xl-3">
-                                <div class="d-flex align-items-baseline">
-                                    <input
-                                            id="2"
-                                            type="checkbox"
-                                            name="vung-dau"
-                                            value="Đầu gối"
-                                    />
-                                    <label class="ps-3">Đầu gối</label>
+                                    <label class="ps-3" th:text="${medicalHistory.name}"></label>
                                 </div>
                             </div>
                         </div>
@@ -204,12 +193,12 @@
                             <div th:each="reason: ${listReason}" class="col-md-6 col-lg-6 col-xl-3">
                                 <div class="d-flex align-items-baseline">
                                     <input
-                                            th:id="${reason.getId()}"
+                                            th:id="${reason.id}"
                                             type="checkbox"
-                                            th:name="${reason.getName()}"
-                                            th:value="${reason.getName()}"
+                                            name="nguyen-nhan"
+                                            th:value="${reason.id}"
                                     />
-                                    <label class="ps-3" th:text="${reason.getName()}"></label>
+                                    <label class="ps-3" th:text="${reason.name}"></label>
                                 </div>
                             </div>
                         </div>
@@ -221,10 +210,10 @@
                             <div th:each="symptom : ${listClinicalSymptom}" class="col-md-6 col-lg-6 col-xl-3">
                                 <div class="d-flex align-items-baseline">
                                     <input
-                                            th:id="${symptom.getId()}"
+                                            th:id="${symptom.id}"
                                             type="checkbox"
-                                            th:name="${symptom.getName()}"
-                                            th:value="${symptom.getName()}"
+                                            name="trieu-chung"
+                                            th:value="${symptom.id}"
                                     />
                                     <label class="ps-3" th:text="${symptom.getName()}"></label>
                                 </div>
@@ -240,8 +229,8 @@
                                     <input
                                             th:id="${symptom.getId()}"
                                             type="checkbox"
-                                            th:name="${symptom.getName()}"
-                                            th:value="${symptom.getName()}"
+                                            name="trieu-chung"
+                                            th:value="${symptom.id}"
                                     />
                                     <label class="ps-3" th:text="${symptom.getName()}"></label>
                                 </div>
@@ -257,8 +246,8 @@
                                     <input
                                             th:id="${symptom.getId()}"
                                             type="checkbox"
-                                            th:name="${symptom.getName()}"
-                                            th:value="${symptom.getName()}"
+                                            name="trieu-chung"
+                                            th:value="${symptom.id}"
                                     />
                                     <label class="ps-3" th:text="${symptom.getName()}"></label>
                                 </div>
@@ -274,15 +263,17 @@
                                     <input
                                             th:id="${symptom.getId()}"
                                             type="checkbox"
-                                            th:name="${symptom.getName()}"
-                                            th:value="${symptom.getName()}"
+                                            name="trieu-chung"
+                                            th:value="${symptom.id}"
                                     />
                                     <label class="ps-3" th:text="${symptom.getName()}"></label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="position-fixed bottom-0 start-0 btn btn-primary">Submit</button>
+                    <button type="submit" style="background-color: #4dc24d;
+    color: white;
+    width: 78px;" class="mx-auto btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>

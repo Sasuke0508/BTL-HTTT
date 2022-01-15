@@ -120,7 +120,7 @@ public class CaseBaseReasoning {
 
         // Get list case có trong hệ thống
         List<Case> listCase = caseRepo.findAll();
-        listCase.forEach(aCase -> System.out.println(aCase.getId()));
+//        listCase.forEach(aCase -> System.out.println(aCase.getId()));
         Map<String, Double> listCaseInSystem = new TreeMap<String, Double>();
         if (typeList.size() > 0) {
             // Get list case by list type of disease
@@ -183,10 +183,12 @@ public class CaseBaseReasoning {
             newCase.setReasonList(listReasonResult);
             newCase.setDiseaseList(listResult);
             newCase.setMedicalHistoryList(listMedicalHistoryResult);
-            System.out.println("Bệnh: " + listResult.get(0).getName() + " " + maxCompare*100 + "%");
-            System.out.println("Tổng trọng số của case: " + sumOfWeight);
+            for(Disease disease: listResult) {
+                System.out.println("Bệnh: " + disease.getName() + " " + maxCompare*100 + "%");
+                System.out.println("Tổng trọng số của case: " + sumOfWeight);
+            }
             newCase.setId((int)caseRepo.count()+ 1);
-            caseRepo.save(newCase);
+//            caseRepo.save(newCase);
 
             model.addAttribute("listResult", listResult);
             model.addAttribute("compare", 100*Math.round(maxCompare * 100) / 100);

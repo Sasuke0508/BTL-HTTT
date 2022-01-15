@@ -144,8 +144,9 @@
         <div class="container">
             <h4 class="fw-bold text-center text-danger">Kết quả chẩn đoán</h4>
             <h5>Hồ sơ bệnh án</h5>
-            <h6>Loại chấn thương: <span th:each="disease: ${typeOfDisease}">
-                <span th:text="${disease + ', '}"></span>
+            <h6>Loại chấn thương: <span th:if="${typeOfDisease == null}">Chưa xác định</span> <span th:each="disease: ${typeOfDisease}">
+                <span th:if="${disease.equals('Co_chan')}">Cổ chân, cẳng chân; </span>
+                <span th:if="${disease.equals('Dau_goi')}">Đầu gối; </span>
             </span>
             </h6>
             <h6>Bệnh sử: <span th:if="${listMedicalHistory==null}">Không</span></h6>
@@ -168,24 +169,24 @@
             </div>
 
             <div th:if="${error!=null}">
-                <h5>-> Kết quả chẩn đoán: Không thể xác định bệnh
+                <h5>--> Kết quả chẩn đoán: Không thể xác định bệnh
                 </h5>
             </div>
             <!-- ELSE -->
             <div th:unless="${error!=null}">
-                <h5>-> Kết quả chẩn đoán:
+                <h5>--> Kết quả chẩn đoán:
                 </h5>
                 <div th:if="${listResult.size()==1}">
-                    <p>Bệnh nhân có thể mắc bệnh <span th:text="${listResult.get(0).name}"></span>- Độ chính xác <span th:text="${compare}"></span> %</p>
+                    <p>Bệnh nhân có thể mắc bệnh <span th:text="${listResult.get(0).name}"></span> - Độ chính xác <span th:text="${compare}"></span> %</p>
                     <i th:text="${listResult.get(0).description}"></i>
                     <p>Lời khuyên: <span th:text="${listResult.get(0).solutionList.get(0).content}"></span></p>
                     <p>Tham khảo: <span th:text="${listResult.get(0).solutionList.get(0).reference}"></span></p>
                 </div>
                 <div th:unless="${listResult.size()==1}">
-                    <ol th:each="disease : ${listResult}">Bệnh nhân có thể mắc 1 trong các bệnh sau:
-                        <li th:text="${disease.name} - Độ chính xác ${compare}'%'"></li>
+                    <ul th:each="disease : ${listResult}">Bệnh nhân có thể mắc 1 trong các bệnh sau:
+                        <li style="font-weight: bold"><span th:text="${disease.name}"></span> - Độ chính xác <span th:text="${compare}"></span> %</li>
                         <i th:text="${disease.description}"></i>
-                    </ol>
+                    </ul>
                 </div>
             </div>
         </div>

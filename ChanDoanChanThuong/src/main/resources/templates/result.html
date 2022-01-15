@@ -173,6 +173,8 @@
             </div>
             <!-- ELSE -->
             <div th:unless="${error!=null}">
+                <h5>-> Kết quả chẩn đoán:
+                </h5>
                 <div th:if="${listResult.size()==1}">
                     <p>Bệnh nhân có thể mắc bệnh <span th:text="${listResult.get(0).name}"></span>- Độ chính xác <span th:text="${compare}"></span> %</p>
                     <i th:text="${listResult.get(0).description}"></i>
@@ -186,8 +188,6 @@
                     </ol>
                 </div>
             </div>
-            <h5>-> Kết quả chẩn đoán: <span th:if="${error!=null}">${error}</span>
-            </h5>
         </div>
     </div>
 </div>
